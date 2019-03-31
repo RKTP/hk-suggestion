@@ -18,8 +18,8 @@ import tornado.httpserver
 from tornado.httpclient import AsyncHTTPClient, HTTPError
 from tornado import web, escape, log
 
-import pymysql
-import aiomysql
+# import pymysql
+# import aiomysql
 
 
 class MockHandler(tornado.web.RequestHandler):
