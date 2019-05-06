@@ -45,7 +45,7 @@ class SqlHandler():
     async def get_metadata(self):
         pass
 
-    async def get_keywords(self):
+    async def get_user_with_keywords(self):
         pass
 
     async def get_history(self):

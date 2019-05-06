@@ -20,9 +20,13 @@ from db import *
 
 class RecommendHandler(tornado.web.RequestHandler):
     async def get(self, user_id):
+        dbc = dbf.create_handler()
 
+        history = await dbc.get_history(user_id)
+        user = await dbc.get_user_with_keywords(user_id)
+        user.build_interest(recommender.articles, history)
 
-        article_ids = recommender.
+        article_ids = recommender.recommend(user)
         response = {
             'uid': user_id,
             'articles': article_ids
@@ -43,8 +47,17 @@ def build_app():
 
     return app
 
+async def init_recommender():
+    global recommender
+    dbc = dbf.create_handler()
+    articles = await dbc.get_articles_with_meta()
+    recommender = Recommender(articles)
+
 if __name__  == "__main__":
-    global dbf = DBHandlerFactory()
+    global dbf
+    dbf = DBHandlerFactory()
+    l = asyncio.get_event_loop()
+    l.run_until_complete(init_recommender())
     app = build_app()
     app.listen(5555)
     tornado.ioloop.IOLoop.current().start()
