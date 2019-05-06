@@ -4,8 +4,12 @@ import sys
 import json
 import time
 
+# Only used for mock handler
+import random
+
 from http import HTTPStatus
 from os import path
+
 
 import tornado
 import tornado.ioloop
@@ -14,18 +18,17 @@ import tornado.httpserver
 from tornado.httpclient import AsyncHTTPClient, HTTPError
 from tornado import web, escape, log
 
-from recommender import *
-from db import *
+# import pymysql
+# import aiomysql
 
 
-class RecommendHandler(tornado.web.RequestHandler):
+class MockHandler(tornado.web.RequestHandler):
     async def get(self, user_id):
+        dummy_ids = [ random.randint(15000000, 20000000) for x in range(10) ]
 
-
-        article_ids = recommender.
         response = {
             'uid': user_id,
-            'articles': article_ids
+            'articles': dummy_ids
         }
 
         self.set_status(HTTPStatus.OK)
@@ -37,14 +40,13 @@ class RecommendHandler(tornado.web.RequestHandler):
 def build_app():
     app = tornado.web.Application(
         [
-            (r"/suggest/([a-z0-9]+)", RecommendHandler),
+            (r"/suggest/([a-z0-9]+)", MockHandler),
         ]
     )
 
     return app
 
 if __name__  == "__main__":
-    global dbf = DBHandlerFactory()
     app = build_app()
     app.listen(5555)
     tornado.ioloop.IOLoop.current().start()
