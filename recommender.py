@@ -2,7 +2,6 @@ import os
 import math
 import gc
 import operator
-import numpy as np
 
 from collections import Counter
 
