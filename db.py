@@ -81,7 +81,7 @@ class SqlHandler():
         c = await self.conn.cursor()
         query = "INSERT IGNORE INTO `ArticleHistory` (`uid`, `aid`, `feedback`, `timestamp`, `read`) VALUES (%s, %s, NULL, now()+0, 0)"
         for a in articles:
-            params = [uid, a]
+            params = [uid, a[0]]
             await c.execute(query, params)
         await self.commit()
         await c.close()
