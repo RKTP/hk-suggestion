@@ -75,5 +75,12 @@ class SqlHandler():
         result = [ History(r[0], r[1]) for r in res ]
         return result
 
-    async def push_recommendation(self):
-        pass
+    async def push_recommendation(self, uid, articles):
+        c = await self.conn.cursor()
+        query = "INSERT IGNORE `ArticleHistory` (`uid`, `aid`, `feedback`, `timestamp`, `read`) VALUES (%s, %s, NULL, now()+0, 0)"
+        for a in articles:
+            params = [uid, a]
+            c.execute(query, params)
+        self.commit()
+
+        c.close()

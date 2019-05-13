@@ -27,14 +27,10 @@ class RecommendHandler(tornado.web.RequestHandler):
         user.build_interest(recommender.articles, history)
 
         article_ids = recommender.recommend(user)
-        response = {
-            'uid': user_id,
-            'articles': article_ids
-        }
 
-        self.set_status(HTTPStatus.OK)
-        self.set_header('Content-Type', 'application/json')
-        self.write(json.dumps(response))
+        await dbc.push_recommendation(user_id, article_ids)
+
+        self.set_status(HTTPStatus.Created)
         self.finish()
 
 

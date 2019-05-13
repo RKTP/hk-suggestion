@@ -29,4 +29,4 @@ class Recommender():
             divider = max(math.log(passed/recommender_config['time_divider'])+1,1)
             rank.append((aid, interest/divider))
         rank = sorted(rank, reverse=True, key=operator.itemgetter(1))
-        return rank[:12]
+        return rank[:10]
