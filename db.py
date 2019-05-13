@@ -1,6 +1,5 @@
 import asyncio
 import json
-import pickle
 
 import aiomysql
 import pymysql
@@ -59,7 +58,7 @@ class SqlHandler():
         c = await self.conn.cursor()
         query = "SELECT `kid` from `Interest` where `Uid` = %s"
         params = [uid]
-        await c.execute(query)
+        await c.execute(query, params)
         res = await c.fetchall()
 
         result = User(res)
@@ -69,7 +68,7 @@ class SqlHandler():
         c = await self.conn.cursor()
         query = "SELECT `aid`, `feedback` from `ArticleHistory` where `uid` = %s"
         params = [uid]
-        await c.execute(query)
+        await c.execute(query, params)
         res = await c.fetchall()
 
         result = [ History(r[0], r[1]) for r in res ]
