@@ -79,7 +79,7 @@ class SqlHandler():
 
     async def push_recommendation(self, uid, articles):
         c = await self.conn.cursor()
-        query = "INSERT IGNORE `ArticleHistory` (`uid`, `aid`, `feedback`, `timestamp`, `read`) VALUES (%s, %s, NULL, now()+0, 0)"
+        query = "INSERT IGNORE INTO `ArticleHistory` (`uid`, `aid`, `feedback`, `timestamp`, `read`) VALUES (%s, %s, NULL, now()+0, 0)"
         for a in articles:
             params = [uid, a]
             await c.execute(query, params)
