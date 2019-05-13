@@ -19,7 +19,7 @@ from db import *
 
 
 class RecommendHandler(tornado.web.RequestHandler):
-    async def get(self, user_id):
+    async def post(self, user_id):
         dbc = await dbf.create_handler()
 
         history = await dbc.get_history(user_id)
