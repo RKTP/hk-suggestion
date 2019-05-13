@@ -18,10 +18,12 @@ class User():
             if h.feedback != None:
                 for k in articles[h.aid].keywords:
                     if k in self.keywords:
-                        if h.feedback:
-                            self.interests[k] = min(2.0, interests[k]+0.025)
+                        if h.feedback == None:
+                            self.interests[k] = min(2.0, self.interests[k]+0.005)
+                        elif h.feedback:
+                            self.interests[k] = min(2.0, self.interests[k]+0.025)
                         else:
-                            self.interests[k] = max(0.5, interests[k]-0.015)
+                            self.interests[k] = max(0.5, self.interests[k]-0.015)
 
 
 class History():
