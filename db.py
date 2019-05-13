@@ -19,7 +19,7 @@ class DBHandlerFactory():
         self.loop = asyncio.get_event_loop()
 
     async def create_handler(self):
-        conn = await aiomysql.connect(host=self.host, port=self.port, user=self.user, password=self.password, db=self.db, charset='utf-8', loop=self.loop, local_infile=True)
+        conn = await aiomysql.connect(host=self.host, port=self.port, user=self.user, password=self.password, db=self.db, charset='utf8', loop=self.loop, local_infile=True)
         return SqlHandler(conn)
 
 
@@ -42,10 +42,10 @@ class SqlHandler():
         pass
 
     async def get_articles_with_meta(self):
-        c = self.conn.cursor()
-        query = "SELECT `Article.aid`, `Feature.InvertedIndex`, `Article.uploadedTimestamp` from `Article` left join `Feature` on Article.aid = Feature.Aid"
-        c.execute(query)
-        res = c.fetchall()
+        c = await self.conn.cursor()
+        query = "SELECT Article.aid, Feature.InvertedIndex, Article.uploadedTimestamp from `Article` left join `Feature` on Article.aid = Feature.Aid"
+        await c.execute(query)
+        res = await c.fetchall()
 
         result = {}
         for r in res:
@@ -56,21 +56,21 @@ class SqlHandler():
         pass
 
     async def get_user_with_keywords(self):
-        c = self.conn.cursor()
+        c = await self.conn.cursor()
         query = "SELECT `kid` from `Interest` where `Uid` = %s"
         params = [uid]
-        c.execute(query)
-        res = c.fetchall()
+        await c.execute(query)
+        res = await c.fetchall()
 
         result = User(res)
         return result
 
     async def get_history(self, uid):
-        c = self.conn.cursor()
+        c = await self.conn.cursor()
         query = "SELECT `aid`, `feedback` from `ArticleHistory` where `uid` = %s"
         params = [uid]
-        c.execute(query)
-        res = c.fetchall()
+        await c.execute(query)
+        res = await c.fetchall()
 
         result = [ History(r[0], r[1]) for r in res ]
         return result
