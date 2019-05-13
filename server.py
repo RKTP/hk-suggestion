@@ -30,7 +30,7 @@ class RecommendHandler(tornado.web.RequestHandler):
 
         await dbc.push_recommendation(user_id, article_ids)
 
-        self.set_status(HTTPStatus.Created)
+        self.set_status(HTTPStatus.CREATED)
         self.finish()
 
 

@@ -49,6 +49,7 @@ class SqlHandler():
         result = {}
         for r in res:
             result[r[0]] = Article.from_db_with_meta(r[0], r[1], r[2].timestamp())
+        await c.close()
         return result
 
     async def get_metadata(self):
@@ -62,6 +63,7 @@ class SqlHandler():
         res = await c.fetchall()
 
         result = User(res)
+        await c.close()
         return result
 
     async def get_history(self, uid):
@@ -72,6 +74,7 @@ class SqlHandler():
         res = await c.fetchall()
 
         result = [ History(r[0], r[1]) for r in res ]
+        await c.close()
         return result
 
     async def push_recommendation(self, uid, articles):
@@ -79,7 +82,6 @@ class SqlHandler():
         query = "INSERT IGNORE `ArticleHistory` (`uid`, `aid`, `feedback`, `timestamp`, `read`) VALUES (%s, %s, NULL, now()+0, 0)"
         for a in articles:
             params = [uid, a]
-            c.execute(query, params)
-        self.commit()
-
-        c.close()
+            await c.execute(query, params)
+        await self.commit()
+        await c.close()
