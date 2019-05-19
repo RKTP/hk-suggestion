@@ -17,18 +17,29 @@ from tornado import web, escape, log
 from recommender import *
 from db import *
 
+import pymysql
+
 
 class RecommendHandler(tornado.web.RequestHandler):
     async def post(self, user_id):
-        dbc = await dbf.create_handler()
+        try:
+            dbc = await dbf.create_handler()
 
-        history = await dbc.get_history(user_id)
-        user = await dbc.get_user_with_keywords(user_id)
-        user.build_interest(recommender.articles, history)
+            history = await dbc.get_history(user_id)
+            user = await dbc.get_user_with_keywords(user_id)
+            user.build_interest(recommender.articles, history)
 
-        article_ids = recommender.recommend(user)
+            article_ids = recommender.recommend(user)
 
-        await dbc.push_recommendation(user_id, article_ids)
+            await dbc.push_recommendation(user_id, article_ids)
+        except pymysql.err.MySQLError as e:
+            self.set_status(HTTPStatus.INTERNAL_SERVER_ERROR)
+            self.finish()
+            return
+        except Exception as e:
+            self.set_status(HTTPStatus.INTERNAL_SERVER_ERROR)
+            self.finish()
+            return
 
         self.set_status(HTTPStatus.CREATED)
         self.finish()
