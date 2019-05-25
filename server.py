@@ -45,10 +45,28 @@ class RecommendHandler(tornado.web.RequestHandler):
         self.finish()
 
 
+class UpdateHandler(tornado.web.RequestHandler):
+    async def post(self):
+        try:
+            await init_recommender()
+        except pymysql.err.MySQLError as e:
+            self.set_status(HTTPStatus.INTERNAL_SERVER_ERROR)
+            self.finish()
+            return
+        except Exception as e:
+            self.set_status(HTTPStatus.INTERNAL_SERVER_ERROR)
+            self.finish()
+            return
+
+        self.set_status(HTTPStatus.OK)
+        self.finish()
+
+
 def build_app():
     app = tornado.web.Application(
         [
             (r"/suggest/([a-z0-9]+)", RecommendHandler),
+            (r"/update", UpdateHandler)
         ]
     )
 
