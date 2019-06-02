@@ -22,17 +22,17 @@ import pymysql
 
 class RecommendHandler(tornado.web.RequestHandler):
     async def post(self, user_id):
-        sys.stderr.write("Request from {} / recommend articles for {}".format(self.request.remote_ip, user_id))
+        sys.stderr.write("Request from {} / recommend articles for {}\n".format(self.request.remote_ip, user_id))
         try:
             dbc = await dbf.create_handler()
 
             history = await dbc.get_history(user_id)
             user = await dbc.get_user_with_keywords(user_id)
-            if history is None or user is None:
-                sys.stderr.write("history or user not exists\n")
-                self.set_status(HTTPStatus.NOT_FOUND)
-                self.finish()
-                return
+            #if user is None:
+            #    sys.stderr.write("history or user not exists\n")
+            #    self.set_status(HTTPStatus.NOT_FOUND)
+            #    self.finish()
+            #    return
             user.build_interest(recommender.articles, history)
 
             article_ids = recommender.recommend(user)
