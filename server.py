@@ -22,11 +22,17 @@ import pymysql
 
 class RecommendHandler(tornado.web.RequestHandler):
     async def post(self, user_id):
+        sys.stderr.write("Request from {} / recommend articles for {}".format(self.request.remote_ip, user_id))
         try:
             dbc = await dbf.create_handler()
 
             history = await dbc.get_history(user_id)
             user = await dbc.get_user_with_keywords(user_id)
+            if history is None or user is None:
+                sys.stderr.write("history or user not exists\n")
+                self.set_status(HTTPStatus.NOT_FOUND)
+                self.finish()
+                return
             user.build_interest(recommender.articles, history)
 
             article_ids = recommender.recommend(user)
@@ -34,10 +40,12 @@ class RecommendHandler(tornado.web.RequestHandler):
             await dbc.push_recommendation(user_id, article_ids)
         except pymysql.err.MySQLError as e:
             self.set_status(HTTPStatus.INTERNAL_SERVER_ERROR)
+            sys.stderr.write(str(e))
             self.finish()
             return
         except Exception as e:
             self.set_status(HTTPStatus.INTERNAL_SERVER_ERROR)
+            sys.stderr.write(str(e))
             self.finish()
             return
 
@@ -50,10 +58,12 @@ class UpdateHandler(tornado.web.RequestHandler):
         try:
             await init_recommender()
         except pymysql.err.MySQLError as e:
+            sys.stderr.write(str(e))
             self.set_status(HTTPStatus.INTERNAL_SERVER_ERROR)
             self.finish()
             return
         except Exception as e:
+            sys.stderr.write(str(e))
             self.set_status(HTTPStatus.INTERNAL_SERVER_ERROR)
             self.finish()
             return
@@ -65,7 +75,7 @@ class UpdateHandler(tornado.web.RequestHandler):
 def build_app():
     app = tornado.web.Application(
         [
-            (r"/suggest/([a-z0-9]+)", RecommendHandler),
+            (r"/suggest/([a-z0-9-]+)", RecommendHandler),
             (r"/update", UpdateHandler)
         ]
     )
@@ -75,8 +85,12 @@ def build_app():
 async def init_recommender():
     global recommender
     dbc = await dbf.create_handler()
-    articles = await dbc.get_articles_with_meta()
-    recommender = Recommender(articles)
+    try:
+        articles = await dbc.get_articles_with_meta()
+        recommender = Recommender(articles)
+    except Exception as e:
+        sys.stderr.write(str(e))
+    sys.stderr.write("Model loading complete\n")
 
 if __name__  == "__main__":
     global dbf
@@ -85,4 +99,5 @@ if __name__  == "__main__":
     l.run_until_complete(init_recommender())
     app = build_app()
     app.listen(5555)
+    sys.stderr.write("Server starts\n")
     tornado.ioloop.IOLoop.current().start()
