@@ -12,18 +12,18 @@ class User():
         self.skips = []
 
         for k in self.keywords:
-            self.interests[k] = 1
+            self.interests[k] = 1.5
         for h in history:
             self.skips.append(h.aid)
             if h.feedback != None:
                 for k in articles[h.aid].keywords:
                     if k in self.keywords:
                         if h.feedback == None:
-                            self.interests[k] = min(2.0, self.interests[k]+0.005)
+                            self.interests[k] = min(2.0, self.interests[k]+0.1)
                         elif h.feedback:
-                            self.interests[k] = min(2.0, self.interests[k]+0.025)
+                            self.interests[k] = min(2.0, self.interests[k]+0.25)
                         else:
-                            self.interests[k] = max(0.5, self.interests[k]-0.015)
+                            self.interests[k] = max(0.5, self.interests[k]-0.1)
 
 
 class History():
