@@ -25,6 +25,8 @@ class User():
                         else:
                             self.interests[k] = max(0.5, self.interests[k]-0.1)
 
+        sys.stderr.write("Score : {}\n".format(self.interests))
+
 
 class History():
     def __init__(self, aid, feedback=None):

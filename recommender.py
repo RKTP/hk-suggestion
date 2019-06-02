@@ -2,6 +2,7 @@ import os
 import math
 import gc
 import time
+import sys
 import operator
 
 from collections import Counter
@@ -30,4 +31,5 @@ class Recommender():
             divider = max(math.log(passed/recommender_config['time_divider'])+1,1)
             rank.append((aid, interest/divider))
         rank = sorted(rank, reverse=True, key=operator.itemgetter(1))
+        sys.stderr.write("Recommending articles : {}\n".format(rank[:10]))
         return rank[:10]
