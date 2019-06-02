@@ -1,10 +1,9 @@
-import sys
 import math
 import pickle as pkl
 
 class User():
     def __init__(self, keywords):
-        self.keywords = keywords
+        self.keywords = [k[0] for k in keywords]
         self.interests = None
         self.skips = None
 
