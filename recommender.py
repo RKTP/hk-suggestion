@@ -21,7 +21,6 @@ class Recommender():
     def recommend(self, user):
         rank = []
         for aid in list(self.articles.keys()):
-            sys.stderr.write("{}\n".format(self.articles[aid].keywords))
             if aid in user.skips:
                 continue
             interest = 0
@@ -31,7 +30,6 @@ class Recommender():
             passed = time.time()-self.articles[aid].timestamp
             divider = max(math.log(passed/recommender_config['time_divider'])+1,1)
             rank.append((aid, interest/divider))
-            sys.stderr.write("articles info: {} / {}\n".format(interest, divider))
         rank = sorted(rank, reverse=True, key=operator.itemgetter(1))
         sys.stderr.write("Recommending articles : {}\n".format(rank[:10]))
         return rank[:10]
